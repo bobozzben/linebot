@@ -1,9 +1,9 @@
 #from __future__ import unicode_literals
 import os,sys 
 from flask import Flask, request, abort
-from linebot import LineBotApi, WebhookHandler
-from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage
+#from linebot import LineBotApi, WebhookHandler
+#from linebot.exceptions import InvalidSignatureError
+#from linebot.models import MessageEvent, TextMessage, TextSendMessage
 import firebirdsql
 #import requests
 #import configparser
@@ -11,37 +11,45 @@ import firebirdsql
 
 app = Flask(__name__)
 
-line_bot_api = LineBotApi("LnaF+kFrRaEfCpGTeHmjCaZuHEI77T7VdHYJfrYxr3UFN/KL5Cb+TAhQJWYld2U2Cjx9CLkuwSclMcxupjsYBnQmz7NCuq0dey8IkjB2ZQXEGfs1oyReCIlJ44/Nats/972/aoApYbjDFE1GjgAa1AdB04t89/1O/w1cDnyilFU=")
-handler = WebhookHandler("3604eceb8524e24dd7eede2dcfbd95d1")
+#line_bot_api = LineBotApi("LnaF+kFrRaEfCpGTeHmjCaZuHEI77T7VdHYJfrYxr3UFN/KL5Cb+TAhQJWYld2U2Cjx9CLkuwSclMcxupjsYBnQmz7NCuq0dey8IkjB2ZQXEGfs1oyReCIlJ44/Nats/972/aoApYbjDFE1GjgAa1AdB04t89/1O/w1cDnyilFU=")
+#handler = WebhookHandler("3604eceb8524e24dd7eede2dcfbd95d1")
 
 # 接收 LINE 的資訊
-#@app.route("/callback", methods=['POST'])
+@app.route("/")
 #@app.route('/', methods=['POST'])
-
-def application(environ,start_response):
+def hello():
 
     conn = firebirdsql.connect(
         host='192.168.0.51',
-        database='192.168.0.51:001',
+        database='001',
         port=3050,
         user='sysdba',
         password='masterkey'
     )
+    print("AAA" )
     cur = conn.cursor()
-    cur.execute("select * from customer order by no")
+    cur.execute("select * from custom order by cusno")
+    print("BBB" )
     for c in cur.fetchall():
-        print(c)
+        print("CCC" )
+        print(c.encode('big-5'))
+        print("DDD" )
+    print("EEE" )
     conn.close()
-
-    status = '200 OK'
+    print("FFF" )
+    #status = '200 OK'
     html = '<html>\n' \
            '<body>\n' \
            ' Hooray, mod_wsgi is working\n' \
            '</body>\n' \
            '</html>\n'
-    response_header = [('Content-type','text/html')]
-    start_response(status,response_header)
-    return [html.encode('utf-8')]
+   # response_header = [('Content-type','text/html')]
+   # start_response(status,response_header)
+    return html  ##"<h1>Hello World!</h1>"
+
+if __name__ == "__main__":
+   app.run(debug=True)
+
 
 
 # #這是註冊 line 給的 
@@ -83,7 +91,4 @@ def application(environ,start_response):
 #           print(usd_to_twd)
 #           line_bot_api.reply_message( event.reply_token
 #              , TextSendMessage(text=f'美元 USD 對台幣 TWD：1:{usd_to_twd}')   )
-
-if __name__ == "__main__":
-   app.run(debug=True)
 
