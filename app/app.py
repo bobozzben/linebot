@@ -4,7 +4,7 @@ from flask import Flask, request, abort
 #from linebot import LineBotApi, WebhookHandler
 #from linebot.exceptions import InvalidSignatureError
 #from linebot.models import MessageEvent, TextMessage, TextSendMessage
-import firebirdsql
+import fdb
 #import requests
 #import configparser
 #import random
@@ -18,23 +18,21 @@ app = Flask(__name__)
 @app.route("/")
 #@app.route('/', methods=['POST'])
 def hello():
-
-    conn = firebirdsql.connect(
-        host='192.168.0.51',
-        database='001',
+    conn = fdb.connect(
+        host='127.0.0.1', database='001',
         port=3050,
-        user='sysdba',
-        password='masterkey'
+        user='sysdba', password='masterkey'
     )
     print("AAA" )
     cur = conn.cursor()
     cur.execute("select * from custom order by cusno")
     print("BBB" )
-    for c in cur.fetchall():
-        print("CCC" )
-        print(c.encode('big-5'))
-        print("DDD" )
-    print("EEE" )
+    print( cur.fetchall() )
+   # for c in cur.fetchall():
+   #     print("CCC" )
+   #     print(c.encode('big-5'))
+    #    print("DDD" )
+    #print("EEE" )
     conn.close()
     print("FFF" )
     #status = '200 OK'
