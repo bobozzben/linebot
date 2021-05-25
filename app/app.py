@@ -26,6 +26,10 @@ def hello():
     print('聯'.encode('utf-8'))
     print('聯'.encode('big5'))
     print('聯')
+    # VSCode 中文無法輸入，不要用ubuntu軟體 安裝，要透過微軟官方庫安裝 
+    #wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | sudo apt-key add -
+    #sudo add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
+    #sudo apt update && sudo apt install code
     #突然顯示又正常了，可能是因為 Ubuntu 沒有安裝中文語系的關係
     conn = fdb.connect(
         host='192.168.3.35', database='002', port=3050, user='sysdba', password='masterkey' , sql_dialect=3  , charset='Big5'  #lc_ctype
