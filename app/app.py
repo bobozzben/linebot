@@ -23,45 +23,74 @@ app = Flask(__name__)
 def hello():
     print("AAA111-2222")
 
-    print('聯'.encode('utf-8'))
-    print('聯'.encode('big5'))
-    print('聯')
-    # VSCode 中文無法輸入，不要用ubuntu軟體 安裝，要透過微軟官方庫安裝 
-    #wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | sudo apt-key add -
-    #sudo add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
-    #sudo apt update && sudo apt install code
-    #突然顯示又正常了，可能是因為 Ubuntu 沒有安裝中文語系的關係
+    # print('聯'.encode('utf-8'))
+    # print('聯'.encode('big5'))
+    # print('聯')
+    # VSCode 中文無法輸入，不要用ubuntu軟體 安裝，要透過微軟官方庫安裝
+    # wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | sudo apt-key add -
+    # sudo add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
+    # sudo apt update && sudo apt install code
+    # 突然顯示又正常了，可能是因為 Ubuntu 沒有安裝中文語系的關係
     conn = fdb.connect(
-        host='192.168.3.35', database='002', port=3050, user='sysdba', password='masterkey' , sql_dialect=3  , charset='Big5'  #lc_ctype
+        # 要指定字集，不然預設是ASCII轉碼會錯誤
+        host='192.168.3.35', database='002', port=3050, user='sysdba', password='masterkey', sql_dialect=3, charset='Big5'
     )
     # 我算算的可以正常顯示
-    #conn = fdb.connect(
-    #    host='192.168.3.35', database='C:/xOneServer/DATAS/001.FDB', port=3055, user='sysdba', password='admin123' , sql_dialect=3  , charset='UTF-8' 
-    #)
-    print("AAA222")
-    print( 'Firebird version:',conn.version)
-    print( 'ODS version:',conn.ods    )
+    # conn = fdb.connect(
+    #    host='192.168.3.35', database='C:/xOneServer/DATAS/001.FDB', port=3055, user='sysdba', password='admin123' , sql_dialect=3  , charset='UTF-8'
+    # )
+    # print("AAA222")
+    print('Firebird version:', conn.version)
+    print('ODS version:', conn.ods)
     cur = conn.cursor()
 
     cur.execute("select cusno,cusname from custom order by cusno rows 2 ")
 
     print("BBB")
-    #data = cur.fetchall()
-    for row in cur:
-        print("BBB 222")
-        print(type(row[1]))
-        print("BBB 333")
-        print(row[1]) 
-        #print((''+row[1]).encode('utf-8'))
+    html = '<html>\n'
+    html = html + ' <head>\n'
+#    html = html + ' <style>\n'
+#    html = html + '  table, th, td { \n'
+#    html = html + '  border: 1px solid black;\n'
+#    html = html + '  } \n'
+#    html = html + ' </style>\n'
+    html = html + '  <meta charset="utf-8">\n'
+    html = html + '  <title>客戶資料</title>\n'
+    html = html + '  <link href="minimal-table.css" rel="stylesheet" type="text/css">\n'
+    html = html + ' </head>\n'
+    html = html + '<body>\n'
+    html = html + 'Hooray, mod_wsgi is working\n'
+    html = html + '<h1> 客戶資料 </h1>\n'
+ 
+    html = html + '<Table>\n'  
+    html = html + '<tr>\n'  
+    for fieldDesc in cur.description:
+        html = html + '<th>\n'  
+        html = html + fieldDesc[fdb.DESCRIPTION_NAME].ljust(fieldDesc[fdb.DESCRIPTION_DISPLAY_SIZE]) + '\n'
+        html = html + '</th>\n'  
+    html = html + '</tr>\n'  
+    print('-' * 78 )
 
-    print("CCC")
+    # For each row, print the value of each field left-justified within
+    # the maximum possible width of that field.
+    fieldIndices = range(len(cur.description))
+    for row in cur:
+        html = html + '<tr>\n'  
+        for fieldIndex in fieldIndices:
+            fieldValue = str(row[fieldIndex])
+            fieldMaxWidth = cur.description[fieldIndex][fdb.DESCRIPTION_DISPLAY_SIZE]
+            html = html + '<td>\n'  
+            html = html + fieldValue.ljust(fieldMaxWidth) + '\n'
+            html = html + '</td>\n'  
+
+        html = html + '</tr>\n'  
+
+    html = html + '</Table>\n'  
+
+    print(html)
     cur.execute("select cusno,cusname from custom order by cusno rows 2 ")
     print("DDD")
 
-    html = '<html>\n'
-    html = html + '<body>\n'
-    html = html + 'Hooray, mod_wsgi is working\n'
-    html = html + '<br> 聯 \n'
 
     print("DDD-1-1-聯")
     for xrow in cur:
